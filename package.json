@@ -26,9 +26,7 @@
   "license": "MIT",
   "dependencies": {
     "babel-runtime": "^6.11.6",
-    "desired-capabilities": "^0.1.0",
-    "node-simctl": "^3.4.4",
-    "simctl": "^0.1.0"
+    "desired-capabilities": "^0.1.0"
   },
   "devDependencies": {
     "babel-eslint": "^6.1.2",

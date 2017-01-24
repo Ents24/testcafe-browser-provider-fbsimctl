@@ -3,36 +3,40 @@
 
 This is the **fbsimctl** browser provider plugin for [TestCafe](http://devexpress.github.io/testcafe).
 
+It allows you to launch the iOS simulator for automated testing in Mobile Safari.
+It uses Facebook's [fbsimctl](https://github.com/facebook/FBSimulatorControl/tree/master/fbsimctl) tool to interface with the Simulator.
+
 ## Install
 
 ```
 npm install testcafe-browser-provider-fbsimctl
 ```
 
+Requirements:
+
+ * This plugin requires that you have XCode >= 8.2 installed, and the iOS simulator available.
+ * [fbsimctl](https://github.com/facebook/FBSimulatorControl/tree/master/fbsimctl) must be installed and available on your `PATH`.
+   ([Installation instructions](https://github.com/facebook/FBSimulatorControl/blob/master/fbsimctl/Documentation/Installation.md))
+
 ## Usage
-
-
-You can determine the available browser aliases by running
-```
-testcafe -b fbsimctl
-```
 
 When you run tests from the command line, use the alias when specifying browsers:
 
 ```
-testcafe fbsimctl:browser1 'path/to/test/file.js'
+testcafe fbsimctl:device:os 'path/to/test/file.js'
 ```
 
+where `device` is something like:
 
-When you use API, pass the alias to the `browsers()` method:
+ * `iPhone 5`
+ * `iPhone SE`
 
-```js
-testCafe
-    .createRunner()
-    .src('path/to/test/file.js')
-    .browsers('fbsimctl:browser1')
-    .run();
-```
+and `os` is something like:
+
+ * `iOS 9.2`
+ * `iOS 10.2`
+
+ `os` is optional - if you exclude it then the most recent OS version will be chosen.
 
 ## Author
- (https://ents24.com)
+ Doug Fitzmaurice [https://www.ents24.com]()

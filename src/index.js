@@ -1,42 +1,31 @@
 import parseCapabilities from 'desired-capabilities';
-import { /*createDevice,*/ getDevices, openUrl, /*shutdown*/ } from 'node-simctl';
-// var simctl = require('simctl');
-var shell = require('shelljs');
+var childProcess = require('child_process');
 
 export default {
     // Multiple browsers support
     isMultiBrowser: false,
 
-    //UDID of the device currently running the test
-    chosenDevice: null,
+    currentBrowsers: {},
 
-    // Required - must be implemented
-    // Browser control
     async openBrowser (id, pageUrl, browserName) {
         var browserDetails = this._getBrowserDetails(browserName);
         var device = this._getDeviceFromDetails(browserDetails);
 
-        this.chosenDevice = device.udid;
-        this._log('Acquired device ' + device.name + ' running on ' + device.sdk);
-        // this.udid = await createDevice('test', chosenDevice.name, browserDetails.platform);
-        // await simExec('boot', 0 [chosenDevice]);
+        if (device === null) 
+            throw new Error('Could not find a valid iOS device to test on');
 
-        //if (device.state !== 'Booted') {
-            //this._log('Device was not booted - booting now');
-            //simctl.boot(this.chosenDevice);
-        //}
+        this.currentBrowsers[id] = device;
 
-        var command = 'open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app --args -CurrentDeviceUDID ' + device.udid;
+        //If the device is not Shutdown we don't know what state it's in - shut it down and reboot it
+        if (device.state !== 'Shutdown')
+            childProcess.execSync('fbsimctl ' + device.udid + ' shutdown', { stdio: 'ignore' });
 
-        shell.exec(command);
-
-        this._log('Device booted - launching URL');
-        openUrl(this.chosenDevice, pageUrl);
+        childProcess.execSync('fbsimctl ' + device.udid + ' boot', { stdio: 'ignore' });
+        childProcess.execSync('fbsimctl ' + device.udid + ' open ' + pageUrl, { stdio: 'ignore' });
     },
 
-    async closeBrowser (/*id*/) {
-        // this._log('Job done - shutting down device');
-        // shutdown(this.chosenDevice);
+    async closeBrowser (id) {
+        childProcess.execSync('fbsimctl ' + this.currentBrowsers[id].udid + ' shutdown', { stdio: 'ignore' });
     },
 
 
@@ -48,7 +37,15 @@ export default {
 
     // Browser names handling
     async getBrowserList () {
-        return getDevices();
+        var lines = [];
+
+        for (var device of this.availableDevices) {
+            var line = device.name + ' running on ' + device.sdk;
+
+            lines.push(line);
+        }
+
+        return lines;
     },
 
     async isValidBrowserName (browserName) {
@@ -57,32 +54,45 @@ export default {
         return this._getDeviceFromDetails(browserDetails) !== null;
     },
 
-
     // Extra methods
     async resizeWindow (/* id, width, height, currentWidth, currentHeight */) {
         this.reportWarning('The window resize functionality is not supported by the "fbsimctl" browser provider.');
     },
 
-    async takeScreenshot (/* id, screenshotPath, pageWidth, pageHeight */) {
-        this.reportWarning('The screenshot functionality is not currently supported by the "fbsimctl" browser provider.');
+    async takeScreenshot (id, screenshotPath) {
+        childProcess.execSync('xcrun simctl io ' + this.currentBrowsers[id].udid + ' screenshot ' + screenshotPath);
     },
 
     _getBrowserDetails (browserName) {
         return parseCapabilities(browserName)[0];
     },
 
-    async _getAvailableDevices () {
-        this.availableDevices = await getDevices();
-        // var av2 = simctl.list();
-        
-        // console.dir(av2);
-        // console.log('');
+    _getAvailableDevices () {
+        //Get the list of available devices from fbsimctl's list command
+        var rawDevices = childProcess.execSync('fbsimctl list').toString().split('\n');
+        var availableDevices = {};
+
+        //Split each device entry apart on the separator, and build an object from the parts
+        for (var entry of rawDevices) {
+            var parts = entry.split(' | ');
+            var device = { name: parts[3], sdk: parts[4], udid: parts[0], state: parts[2] };
+
+            //We can't run tests on tvOS or watchOS, so only include iOS devices
+            if (device.sdk && device.sdk.startsWith('iOS')) {
+                if (!availableDevices[device.sdk])
+                    availableDevices[device.sdk] = []; 
+                
+                availableDevices[device.sdk].push(device);
+            }
+        }
+        this.availableDevices = availableDevices;
     },
 
     _getDeviceFromDetails (browserDetails) {
 
-        //If the user hasn't specified a platform, find all the available ones and choose the newest
+        // If the user hasn't specified a platform, find all the available ones and choose the newest
         if (browserDetails.platform === 'any') {
+            this._log('finding available platform');
             var platforms = Object.keys(this.availableDevices);
 
             platforms.sort();
@@ -90,6 +100,8 @@ export default {
         }
 
         var devicesOnPlatform = this.availableDevices[browserDetails.platform];
+
+        //Do a lowercase match on the device they have asked for so we can be nice about iphone vs iPhone
         var devices = devicesOnPlatform.filter(device => {
             return device.name.toLowerCase() === browserDetails.browserName.toLowerCase();
         });
@@ -98,9 +110,5 @@ export default {
             return null;
 
         return devices[0];
-    },
-
-    _log (message) {
-        console.log(message);
     }
 };
