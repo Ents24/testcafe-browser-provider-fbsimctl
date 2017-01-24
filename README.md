@@ -1,5 +1,6 @@
 # testcafe-browser-provider-fbsimctl
 [![Build Status](https://travis-ci.org/dig412/testcafe-browser-provider-fbsimctl.svg)](https://travis-ci.org/dig412/testcafe-browser-provider-fbsimctl)
+[![npm](https://img.shields.io/npm/v/testcafe-browser-provider-fbsimctl.svg)](https://www.npmjs.com/package/testcafe-browser-provider-fbsimctl)
 
 This is the **fbsimctl** browser provider plugin for [TestCafe](http://devexpress.github.io/testcafe).
 
