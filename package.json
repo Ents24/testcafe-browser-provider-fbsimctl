@@ -1,13 +1,13 @@
 {
   "name": "testcafe-browser-provider-fbsimctl",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "fbsimctl TestCafe browser provider plugin.",
-  "repository": "https://github.com/dig412/testcafe-browser-provider-fbsimctl",
-  "homepage": "https://github.com/dig412/testcafe-browser-provider-fbsimctl",
+  "repository": "https://github.com/Ents24/testcafe-browser-provider-fbsimctl",
+  "homepage": "https://github.com/Ents24/testcafe-browser-provider-fbsimctl",
   "author": {
-    "name": "",
+    "name": "Doug Fitzmaurice",
     "email": "",
-    "url": "https://ents24.com"
+    "url": "https://www.ents24.com"
   },
   "main": "lib/index",
   "files": [
@@ -21,7 +21,8 @@
   "keywords": [
     "testcafe",
     "browser provider",
-    "plugin"
+    "plugin",
+    "ios simulator"
   ],
   "license": "MIT",
   "dependencies": {
