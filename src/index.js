@@ -37,16 +37,9 @@ export default {
 
     // Browser names handling
     async getBrowserList () {
-        var lines = [];
-        var platforms = Object.keys(this.availableDevices).sort();
-
-        platforms.forEach(platform => {
-            var devicesOnPlatform = this.availableDevices[platform];
-            
-            devicesOnPlatform.forEach(device => lines.push(`fbsimctl:${device.name}:${platform}`));
-        });
+        var devicesList = this._getSortedAvailableDevicesList();
         
-        return lines;
+        return devicesList.map(device => `fbsimctl:${device.name}:${device.sdk}`);
     },
 
     async isValidBrowserName (browserName) {
@@ -89,26 +82,40 @@ export default {
         this.availableDevices = availableDevices;
     },
 
-    _getDeviceFromDetails (browserDetails) {
+    _getSortedAvailableDevicesList () {
+        const IOS_REPLACER = 'iOS '; 
 
-        // If the user hasn't specified a platform, find all the available ones and choose the newest
-        if (browserDetails.platform === 'any') {
-            var platforms = Object.keys(this.availableDevices);
+        var platformVersions = Object.keys(this.availableDevices)
+            .map(device => parseFloat(device.replace(IOS_REPLACER, '')))
+            .sort((a, b) => b - a);
 
-            platforms.sort();
-            browserDetails.platform = platforms[0];
-        }
+        var list = [];
 
-        var devicesOnPlatform = this.availableDevices[browserDetails.platform];
-
-        //Do a lowercase match on the device they have asked for so we can be nice about iphone vs iPhone
-        var devices = devicesOnPlatform.filter(device => {
-            return device.name.toLowerCase() === browserDetails.browserName.toLowerCase();
+        platformVersions.forEach(platformVersion => {
+            var devicesOnPlatform = this.availableDevices[`${IOS_REPLACER}${platformVersion}`];
+            
+            list = list.concat(devicesOnPlatform);
         });
 
-        if (!devices.length)
+        return list;
+    },
+
+    _getDeviceFromDetails ({ platform, browserName }) {
+        // Do a lowercase match on the device they have asked for so we can be nice about iphone vs iPhone
+        platform = platform.toLowerCase();
+        browserName = browserName.toLowerCase();
+
+        var devicesList = this._getSortedAvailableDevicesList();
+        
+        // If the user hasn't specified a platform, find all the available ones and choose the newest
+        var matchedDevices = devicesList.filter(device => {
+            return (platform === 'any' || platform === device.sdk.toLowerCase()) &&
+                browserName === device.name.toLowerCase();
+        });
+
+        if (!matchedDevices.length)
             return null;
 
-        return devices[0];
+        return matchedDevices[0];
     }
 };
