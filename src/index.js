@@ -92,7 +92,6 @@ export default {
 
         // If the user hasn't specified a platform, find all the available ones and choose the newest
         if (browserDetails.platform === 'any') {
-            this._log('finding available platform');
             var platforms = Object.keys(this.availableDevices);
 
             platforms.sort();

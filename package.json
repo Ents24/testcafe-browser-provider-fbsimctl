@@ -1,6 +1,6 @@
 {
   "name": "testcafe-browser-provider-fbsimctl",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "fbsimctl TestCafe browser provider plugin.",
   "repository": "https://github.com/Ents24/testcafe-browser-provider-fbsimctl",
   "homepage": "https://github.com/Ents24/testcafe-browser-provider-fbsimctl",
