@@ -7,6 +7,8 @@ This is the **fbsimctl** browser provider plugin for [TestCafe](http://devexpres
 It allows you to launch the iOS simulator for automated testing in Mobile Safari.
 It uses Facebook's [fbsimctl](https://github.com/facebook/FBSimulatorControl/tree/master/fbsimctl) tool to interface with the Simulator.
 
+![animated example of use](http://s3media.ents24.com.s3.amazonaws.com/image/testcafe/testcafe-example-image.gif)
+
 ## Install
 
 ```
