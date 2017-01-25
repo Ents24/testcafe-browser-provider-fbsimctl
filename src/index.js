@@ -1,9 +1,9 @@
 import parseCapabilities from 'desired-capabilities';
-var childProcess = require('child_process');
+import childProcess from 'child_process';
 
 export default {
     // Multiple browsers support
-    isMultiBrowser: false,
+    isMultiBrowser: true,
 
     currentBrowsers: {},
 
@@ -38,13 +38,14 @@ export default {
     // Browser names handling
     async getBrowserList () {
         var lines = [];
+        var platforms = Object.keys(this.availableDevices).sort();
 
-        for (var device of this.availableDevices) {
-            var line = device.name + ' running on ' + device.sdk;
-
-            lines.push(line);
-        }
-
+        platforms.forEach(platform => {
+            var devicesOnPlatform = this.availableDevices[platform];
+            
+            devicesOnPlatform.forEach(device => lines.push(`fbsimctl:${device.name}:${platform}`));
+        });
+        
         return lines;
     },
 
