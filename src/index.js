@@ -39,7 +39,7 @@ export default {
     async getBrowserList () {
         var devicesList = this._getSortedAvailableDevicesList();
         
-        return devicesList.map(device => `fbsimctl:${device.name}:${device.sdk}`);
+        return devicesList.map(device => `${device.name}:${device.sdk}`);
     },
 
     async isValidBrowserName (browserName) {
