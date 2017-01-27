@@ -1,5 +1,7 @@
 import parseCapabilities from 'desired-capabilities';
 import childProcess from 'child_process';
+import startSimulator from './start-simulator.js';
+
 
 export default {
     // Multiple browsers support
@@ -20,8 +22,9 @@ export default {
         if (device.state !== 'Shutdown')
             childProcess.execSync('fbsimctl ' + device.udid + ' shutdown', { stdio: 'ignore' });
 
-        childProcess.execSync('fbsimctl ' + device.udid + ' boot', { stdio: 'ignore' });
-        childProcess.execSync('fbsimctl ' + device.udid + ' open ' + pageUrl, { stdio: 'ignore' });
+        await startSimulator(device);
+
+        childProcess.execSync(`xcrun simctl openurl ${device.udid} ${pageUrl}`, { stdio: 'ignore' });
     },
 
     async closeBrowser (id) {
