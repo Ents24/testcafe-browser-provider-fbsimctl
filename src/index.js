@@ -58,6 +58,7 @@ export default {
 
     async takeScreenshot (id, screenshotPath) {
         var command = 'xcrun simctl io ' + this.currentBrowsers[id].udid + ' screenshot \'' + screenshotPath + '\'';
+
         childProcess.execSync(command);
     },
 
