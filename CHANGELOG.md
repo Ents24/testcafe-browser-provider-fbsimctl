@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.0.5]
+### Changed
+- @Omonk prevent list of available devices containing null values
+
 ## [0.0.4]
 ### Changed
 - @AndreyBelym fixed boot behaviour, so that the provider properly waits for the Simulator to be ready on all iOS versions
