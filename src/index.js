@@ -90,19 +90,13 @@ export default {
     _getSortedAvailableDevicesList () {
         const IOS_REPLACER = 'iOS '; 
 
-        var platformVersions = Object.keys(this.availableDevices)
+        return Object.keys(this.availableDevices)
             .map(device => parseFloat(device.replace(IOS_REPLACER, '')))
-            .sort((a, b) => b - a);
-
-        var list = [];
-
-        platformVersions.forEach(platformVersion => {
-            var devicesOnPlatform = this.availableDevices[`${IOS_REPLACER}${platformVersion}`];
-            
-            list = list.concat(devicesOnPlatform);
-        });
-
-        return list;
+            .sort((a, b) => b - a)
+            .reduce((acc, curr) => {
+                var devicesOnPlatform = this.availableDevices[`${IOS_REPLACER}${curr}`]
+                return devicesOnPlatform ? acc.concat[devicesOnPlatform] : devicesOnPlatform
+            },[]);
     },
 
     _getDeviceFromDetails ({ platform, browserName }) {
